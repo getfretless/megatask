@@ -4,16 +4,20 @@ var Megatask = function() {
     var self = this;
 
     function saveTasks() {
+      updatePositions();
       Task.saveTasks(self.tasks);
     }
-    function getTaskIdFromListItem(listItem) {
-      var id = listItem.attr('id');
-      return id.substring(id.lastIndexOf('_') + 1);
+    function updatePositions() {
+      var orderedElementIds = $('#tasks').sortable('toArray');
+      $.each(orderedElementIds, function(index, elementId) {
+        var id = Utility.idFromElementId(elementId);
+        self.tasks[id].position = index + 1;
+      });
     };
 
     $('#tasks').on('click', 'button.edit', function() {
       var listItem = $(this).closest('li');
-      var id = getTaskIdFromListItem(listItem);
+      var id = Utility.idFromElementId(listItem.attr('id'));
       var editForm = $('#edit-form-template').clone();
       editForm.find('input.task_name').val(self.tasks[id].name)
       editForm.removeClass('hidden');
@@ -23,7 +27,7 @@ var Megatask = function() {
 
     $('#tasks').on('click', 'button.btn-danger', function() {
       var listItem = $(this).closest('li');
-      var id = getTaskIdFromListItem(listItem);
+      var id = Utility.idFromElementId(listItem.attr('id'));
       delete self.tasks[id];
       listItem.remove();
       saveTasks();
@@ -32,14 +36,14 @@ var Megatask = function() {
     $(document).on('click', '.edit_task button.cancel', function(ev) {
       ev.preventDefault();
       var listItem = $(ev.currentTarget).closest('li');
-      var id = getTaskIdFromListItem(listItem);
+      var id = Utility.idFromElementId(listItem.attr('id'))
       listItem.replaceWith(self.tasks[id].buildListItem());
     });
 
-    $(document).on('click', '.edit_task input[type="submit"]', function(ev) {
+    $(document).on('submit', '.edit_task', function(ev) {
       ev.preventDefault();
       var listItem = $(ev.currentTarget).closest('li');
-      var id = getTaskIdFromListItem(listItem);
+      var id = Utility.idFromElementId(listItem.attr('id'));
       self.tasks[id].name = listItem.find('input.task_name').val();
       listItem.replaceWith(self.tasks[id].buildListItem());
       saveTasks();
@@ -48,13 +52,17 @@ var Megatask = function() {
     $('#new_task').submit(function(ev) {
       ev.preventDefault();
       var task = new Task({
-        name: $(this.elements.task_name).val()
+        name: $(this.elements.task_name).val(),
+        position: Object.keys(self.tasks).length + 1
       })
       self.tasks[task.id] = task;
       $(this.elements.task_name).val('');
       saveTasks();
     });
 
+    $('#tasks').sortable({
+      update: function() { saveTasks(); }
+    });
   }
   return Megatask;
 }();

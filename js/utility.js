@@ -6,5 +6,8 @@ var Utility = {
     } catch(e) {
       return false;
     }
+  },
+  idFromElementId: function(elementId) {
+    return elementId.substring(elementId.lastIndexOf('_') + 1);
   }
 }

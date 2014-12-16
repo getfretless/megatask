@@ -35,8 +35,15 @@ Task.saveTasks = function(tasks) {
 Task.all = function() {
   var task, tasks = {};
   if (Task.tasksPresent()) {
-    var allTaskProperties = JSON.parse(localStorage.tasks);
-    $.each(allTaskProperties, function(index, taskProperties){
+    var loadedTasks = JSON.parse(localStorage.tasks);
+    var orderedTasks = [];
+    $.each(loadedTasks, function(index, task) {
+      orderedTasks.push(task);
+    });
+    orderedTasks.sort(function(a, b) {
+      return a.position - b.position;
+    });
+    $.each(orderedTasks, function(index, taskProperties){
       task = new Task(taskProperties);
       tasks[task.id] = task;
     });
