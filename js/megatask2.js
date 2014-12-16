@@ -4,16 +4,12 @@ var Megatask = function() {
     var self = this;
 
     function saveTasks() {
-      if (Utility.supportsStorage()) {
-        localStorage.tasks = JSON.stringify(self.tasks);
-      }
-    };
-
-    var getTaskIdFromListItem = function(listItem) {
+      Task.saveTasks(self.tasks);
+    }
+    function getTaskIdFromListItem(listItem) {
       var id = listItem.attr('id');
       return id.substring(id.lastIndexOf('_') + 1);
     };
-
 
     $('#tasks').on('click', 'button.edit', function() {
       var listItem = $(this).closest('li');
@@ -22,6 +18,7 @@ var Megatask = function() {
       editForm.find('input.task_name').val(self.tasks[id].name)
       editForm.removeClass('hidden');
       listItem.html(editForm);
+      editForm.find('input.task_name').select();
     });
 
     $('#tasks').on('click', 'button.btn-danger', function() {
@@ -29,6 +26,22 @@ var Megatask = function() {
       var id = getTaskIdFromListItem(listItem);
       delete self.tasks[id];
       listItem.remove();
+      saveTasks();
+    });
+
+    $(document).on('click', '.edit_task button.cancel', function(ev) {
+      ev.preventDefault();
+      var listItem = $(ev.currentTarget).closest('li');
+      var id = getTaskIdFromListItem(listItem);
+      listItem.replaceWith(self.tasks[id].buildListItem());
+    });
+
+    $(document).on('click', '.edit_task input[type="submit"]', function(ev) {
+      ev.preventDefault();
+      var listItem = $(ev.currentTarget).closest('li');
+      var id = getTaskIdFromListItem(listItem);
+      self.tasks[id].name = listItem.find('input.task_name').val();
+      listItem.replaceWith(self.tasks[id].buildListItem());
       saveTasks();
     });
 
