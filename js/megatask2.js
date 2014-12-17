@@ -49,6 +49,14 @@ var Megatask = function() {
       saveTasks();
     });
 
+    $(document).on('click', ':checkbox', function(ev) {
+      var listItem = $(ev.currentTarget).closest('li');
+      var id = Utility.idFromElementId(listItem.attr('id'));
+      self.tasks[id].completed = ev.currentTarget.checked;
+      listItem.toggleClass('completed');
+      saveTasks();
+    });
+
     $('#new_task').submit(function(ev) {
       ev.preventDefault();
       var task = new Task({

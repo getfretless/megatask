@@ -20,7 +20,7 @@ var Task = function() {
       var list = $('#list-template').clone();
       return list.html().replace('{{ task.id }}', task.id)
         .replace('{{ task.completed }}', (task.completed ? 'completed' : ''))
-        .replace('{{ task.checked }}', (task.completed ? 'checked' : ''))
+        .replace('{{="" task.checked="" }}=""', (task.completed ? 'checked' : ''))
         .replace('{{ task.name }}', task.name);
     }
     $('#tasks').append(this.buildListItem());
